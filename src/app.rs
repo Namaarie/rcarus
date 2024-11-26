@@ -6,7 +6,7 @@ use crate::{
     texture::{self, Texture},
     util,
 };
-use cgmath::prelude::*;
+use glam::{self, Vec3};
 use std::sync::Arc;
 use std::{iter, time::Instant};
 use wgpu::util::DeviceExt;
@@ -353,9 +353,13 @@ impl<'a> State<'a> {
         // roll is rotation around forward axis (+-Z)
         // pitch is rotation around X axis basically up/down
         // yaw is rotation around Y axis basically left/right
-        let camera = camera::Camera::new((0.0, 1.0, 5.0), cgmath::Deg(-90.0), cgmath::Deg(0.0));
-        let projection =
-            camera::Projection::new(config.width, config.height, cgmath::Deg(60.0), 0.1, 10000.0);
+        let camera = camera::Camera::new(
+            Vec3::from_array([0.0, 1.0, 5.0]),
+            -std::f32::consts::FRAC_PI_2,
+            0.0,
+        );
+        // 1.0472 rads = 60 deg
+        let projection = camera::Projection::new(config.width, config.height, 1.0472, 0.1, 10000.0);
         let camera_controller =
             camera::CameraController::new(CONFIG.camera_speed, CONFIG.camera_sensitivity);
 
@@ -519,63 +523,18 @@ impl<'a> State<'a> {
 
                         //let y = ((x/100.0).sin() + (z/100.0).sin()).abs()*25.0;
 
-                        let position = cgmath::Vector3 {
+                        let position = glam::Vec3 {
                             x: x as f32,
                             y: y as f32,
                             z: z as f32,
                         };
 
-                        // let rotation = if position.is_zero() {
-                        //     // this is needed so an object at (0, 0, 0) won't get scaled to zero
-                        //     // as Quaternions can affect scale if they're not created correctly
-                        //     cgmath::Quaternion::from_axis_angle(cgmath::Vector3::unit_z(), cgmath::Deg(0.0))
-                        // } else {
-                        //     cgmath::Quaternion::from_axis_angle(position.normalize(), cgmath::Deg(45.0))
-                        // };
-
-                        // let rotation = cgmath::Quaternion::from_axis_angle((0.0, 1.0, 0.0).into(), cgmath::Deg(180.0));
-
-                        let rotation = cgmath::Quaternion::one();
+                        let rotation = glam::Quat::IDENTITY;
                         Instance { position, rotation }
                     })
                 })
             })
             .collect::<Vec<_>>();
-
-        // const SPACE_BETWEEN: f32 = 2.0;
-        // let instances = (0..NUM_INSTANCES_PER_ROW)
-        //     .flat_map(|z| {
-        //         (0..NUM_INSTANCES_PER_ROW).map(move |x| {
-        //             let x = SPACE_BETWEEN * (x as f32 - NUM_INSTANCES_PER_ROW as f32 / 2.0);
-        //             let z = SPACE_BETWEEN * (z as f32 - NUM_INSTANCES_PER_ROW as f32 / 2.0);
-
-        //             let position = cgmath::Vector3 { x, y: 0.0, z };
-
-        // 			let rotation = cgmath::Quaternion::one();
-
-        //             Instance { position, rotation }
-        //         })
-        //     })
-        //     .collect::<Vec<_>>();
-
-        // let mut pos = cgmath::Vector2::new(25.0, 0.0);
-        // let angle: f32 = std::f32::consts::FRAC_1_SQRT_2;
-        // let instances = (0..1_000_000).map(|i| {
-        //     let rot = (((i as f32) / 1_000_000_f32) * 1000.0);
-        //     let theta = rot * 1000.0;
-        //     let r = (rot * 100.0).sin()*50.0;
-
-        //     let y = rot + current_time.elapsed().as_secs_f32().sin() * 100.0;
-
-        //     let x = r * theta.cos() * y.sqrt() * 2.0 + r * 5.0;
-        //     let z = r * theta.sin() * y.log2() * 2.0 + r * 5.0 + x.sin();
-
-        //     let rotation = cgmath::Quaternion::one();
-        //     let position = cgmath::Vector3{x, y, z};
-        //     Instance {
-        //         position, rotation
-        //     }
-        // }).collect::<Vec<_>>();
 
         let instance_data = instances.iter().map(Instance::to_raw).collect::<Vec<_>>();
         let instance_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
@@ -737,7 +696,7 @@ impl<'a> State<'a> {
             bytemuck::cast_slice(&[self.camera_uniform]),
         );
 
-        let old_position: cgmath::Vector3<_> = self.light_uniform.position.into();
+        let old_position: Vec3 = self.light_uniform.position.into();
         let t = self.start_time.elapsed().as_secs_f64();
 
         self.light_uniform.color = [

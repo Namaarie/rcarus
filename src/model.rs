@@ -1,18 +1,20 @@
+use glam::{Mat3, Mat4, Quat, Vec3};
 use crate::texture;
 use std::ops::Range;
 
 pub struct Instance {
-    pub position: cgmath::Vector3<f32>,
-    pub rotation: cgmath::Quaternion<f32>,
+    pub position: Vec3,
+    pub rotation: Quat,
 }
 
 impl Instance {
     pub fn to_raw(&self) -> InstanceRaw {
-        let model =
-            cgmath::Matrix4::from_translation(self.position) * cgmath::Matrix4::from(self.rotation);
+        // TODO CHECK THIS IS ACCURATE
+        let model = Mat4::from_rotation_translation(self.rotation, self.position);
         InstanceRaw {
-            model: model.into(),
-            normal: cgmath::Matrix3::from(self.rotation).into(),
+            // TODO! CHECK THIS IS ACCURATE
+            model: model.to_cols_array_2d(),
+            normal: Mat3::from_quat(self.rotation).to_cols_array_2d(),
         }
     }
 }

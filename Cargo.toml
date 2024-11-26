@@ -11,8 +11,8 @@ wgpu = {version = "23.0", default-features=false, features=["dx12", "wgsl"]}
 pollster = "0.3"
 bytemuck = { version = "1.20.0", features = [ "derive" ] }
 anyhow = "1.0.93"
-cgmath = "0.18.0"
 tobj = { version = "3.2", default-features = false, features = ["async"]}
+glam = {version="0.29.2", features = ["bytemuck"]}
 
 [dependencies.image]
 version = "0.24"
