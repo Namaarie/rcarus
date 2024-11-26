@@ -1,9 +1,23 @@
-use std::sync::Arc;
-use winit::{application::ApplicationHandler, dpi::PhysicalPosition, event::{DeviceEvent, DeviceId, ElementState, KeyEvent, MouseButton, WindowEvent}, event_loop::ActiveEventLoop, keyboard::{KeyCode, PhysicalKey}, window::{CursorGrabMode, Window, WindowId}};
+use crate::{
+    camera::{self, CameraUniform},
+    hdr,
+    model::{self, DrawLight, DrawModel, Instance, InstanceRaw, Vertex},
+    resources,
+    texture::{self, Texture},
+    util,
+};
 use cgmath::prelude::*;
-use crate::{camera::{self, CameraUniform}, hdr, model::{self, DrawLight, DrawModel, Instance, InstanceRaw, Vertex}, resources, texture::{self, Texture}, util};
+use std::sync::Arc;
 use std::{iter, time::Instant};
 use wgpu::util::DeviceExt;
+use winit::{
+    application::ApplicationHandler,
+    dpi::PhysicalPosition,
+    event::{DeviceEvent, DeviceId, ElementState, KeyEvent, MouseButton, WindowEvent},
+    event_loop::ActiveEventLoop,
+    keyboard::{KeyCode, PhysicalKey},
+    window::{CursorGrabMode, Window, WindowId},
+};
 
 struct Config {
     vsync_mode: wgpu::PresentMode,
@@ -164,7 +178,7 @@ pub struct State<'a> {
 
 impl<'a> State<'a> {
     // Creating some of the wgpu types requires async code
-    pub async fn new(window:  Arc<Window>) -> anyhow::Result<State<'a>> {
+    pub async fn new(window: Arc<Window>) -> anyhow::Result<State<'a>> {
         let start_time = Instant::now();
         let delta_time_f32 = 0.0;
         let delta_time_f64 = 0.0;
@@ -726,7 +740,11 @@ impl<'a> State<'a> {
         let old_position: cgmath::Vector3<_> = self.light_uniform.position.into();
         let t = self.start_time.elapsed().as_secs_f64();
 
-        self.light_uniform.color = [(t.sin()/2.0 + 0.5) as f32, (t.cos()/2.0 + 0.5) as f32, ((t+std::f64::consts::PI).sin()/2.0 + 0.5) as f32];
+        self.light_uniform.color = [
+            (t.sin() / 2.0 + 0.5) as f32,
+            (t.cos() / 2.0 + 0.5) as f32,
+            ((t + std::f64::consts::PI).sin() / 2.0 + 0.5) as f32,
+        ];
 
         self.queue.write_buffer(
             &self.light_buffer,
@@ -817,7 +835,7 @@ pub struct App<'a> {
     state: Option<State<'a>>,
 }
 
-impl <'a>App<'a> {
+impl<'a> App<'a> {
     pub fn new() -> Self {
         Self {
             window: None,
@@ -829,7 +847,11 @@ impl <'a>App<'a> {
 impl ApplicationHandler for App<'_> {
     fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
         if self.window.is_none() {
-            let window = Arc::new(event_loop.create_window(Window::default_attributes()).unwrap());
+            let window = Arc::new(
+                event_loop
+                    .create_window(Window::default_attributes())
+                    .unwrap(),
+            );
             self.window = Some(window.clone());
 
             let state = pollster::block_on(State::new(window.clone())).unwrap();
@@ -846,22 +868,28 @@ impl ApplicationHandler for App<'_> {
         match event {
             DeviceEvent::MouseMotion { delta } => {
                 if self.state.as_mut().unwrap().mouse_grabber.manual_lock {
-                    self.state.as_mut().unwrap().camera_controller.process_mouse(delta.0, delta.1);
+                    self.state
+                        .as_mut()
+                        .unwrap()
+                        .camera_controller
+                        .process_mouse(delta.0, delta.1);
                     self.state.as_mut().unwrap().update_camera_rotation();
                 }
             }
 
             _ => {}
-        } 
+        }
     }
-    
+
     fn window_event(
         &mut self,
         event_loop: &ActiveEventLoop,
         window_id: WindowId,
         event: WindowEvent,
     ) {
-        if window_id == self.state.as_ref().unwrap().window.id() && !self.state.as_mut().unwrap().input(&event){
+        if window_id == self.state.as_ref().unwrap().window.id()
+            && !self.state.as_mut().unwrap().input(&event)
+        {
             match event {
                 // exit if matched close requested
                 WindowEvent::CloseRequested => event_loop.exit(),

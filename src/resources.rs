@@ -148,40 +148,34 @@ pub async fn load_cube(
     let mut materials = Vec::new();
     let mut meshes = Vec::new();
 
-    let top_texture = load_texture(
-        "gravel.png",
-        false,
-        device,
-        queue,
-        wgpu::FilterMode::Nearest,
-    )
-    .await?;
+    let top_texture =
+        load_texture("gravel.png", false, device, queue, wgpu::FilterMode::Linear).await?;
     let down_texture =
-        load_texture("gravel.png", false, device, queue, wgpu::FilterMode::Nearest).await?;
-    let side_texture = load_texture(
-        "gravel.png",
-        false,
-        device,
-        queue,
-        wgpu::FilterMode::Nearest,
-    )
-    .await?;
+        load_texture("gravel.png", false, device, queue, wgpu::FilterMode::Linear).await?;
+    let side_texture =
+        load_texture("gravel.png", false, device, queue, wgpu::FilterMode::Linear).await?;
     let top_normal = load_texture(
         "gravelnormaldx.png",
         true,
         device,
         queue,
-        wgpu::FilterMode::Nearest,
+        wgpu::FilterMode::Linear,
     )
     .await?;
-    let down_normal =
-        load_texture("gravelnormaldx.png", true, device, queue, wgpu::FilterMode::Nearest).await?;
+    let down_normal = load_texture(
+        "gravelnormaldx.png",
+        true,
+        device,
+        queue,
+        wgpu::FilterMode::Linear,
+    )
+    .await?;
     let side_normal = load_texture(
         "gravelnormaldx.png",
         true,
         device,
         queue,
-        wgpu::FilterMode::Nearest,
+        wgpu::FilterMode::Linear,
     )
     .await?;
 

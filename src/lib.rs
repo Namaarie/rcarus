@@ -1,11 +1,11 @@
+mod app;
 mod camera;
 mod hdr;
 mod model;
 mod resources;
+mod state;
 mod texture;
 mod util;
-mod app;
-mod state;
 
 use winit::event_loop::{ControlFlow, EventLoop};
 
