@@ -1,6 +1,6 @@
 use wgpu::Operations;
 
-use crate::{create_render_pipeline, texture};
+use crate::{app::create_render_pipeline, texture};
 
 /// Owns the render texture and controls tonemapping
 pub struct HdrPipeline {

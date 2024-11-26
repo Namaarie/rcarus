@@ -131,6 +131,9 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let tangent_normal = object_normal.xyz * 2.0 - 1.0;
     let world_normal = TBN * tangent_normal;
 
+    let light_distance = distance(light.position, in.world_position);
+    let light_intensity = 10.0 / pow(light_distance, 2.0);
+
     // Create the lighting vectors
     let light_dir = normalize(light.position - in.world_position);
     let view_dir = normalize(in.world_view_position - in.world_position);
@@ -138,7 +141,9 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
 
     // We don't need (or want) much ambient light, so 0.1 is fine
     let ambient_strength = 1.0;
-    let ambient_color = light.color * ambient_strength;
+
+    // should be related to sky color/ambient color in general
+    let ambient_color = vec3<f32>(1.0, 1.0, 1.0) * ambient_strength;
 
     let diffuse_strength = max(dot(world_normal, light_dir), 0.0);
     let diffuse_color = light.color * diffuse_strength;
@@ -152,7 +157,7 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let reflection = textureSample(env_map, env_sampler, world_reflect).rgb;
     let shininess = 0.0;
 
-    let result = (ambient_color + diffuse_color + specular_color) * object_color.xyz + reflection * shininess;
+    let result = (ambient_color + diffuse_color*light_intensity + specular_color*light_intensity) * object_color.xyz + reflection * shininess;
 
     return vec4<f32>(result, object_color.a);
 

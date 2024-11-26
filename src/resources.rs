@@ -2,13 +2,11 @@ use crate::{
     model::{self, Mesh, ModelVertex},
     texture,
 };
-use anyhow::{Context, Ok};
+use anyhow::Ok;
 use image::codecs::hdr::HdrDecoder;
 use std::{
     env,
-    fmt::format,
     io::{BufReader, Cursor},
-    os,
     path::PathBuf,
 };
 use wgpu::util::DeviceExt;
@@ -127,6 +125,7 @@ pub async fn load_binary(file_name: &str) -> anyhow::Result<Vec<u8>> {
     Ok(data)
 }
 
+#[allow(unused)]
 pub async fn load_string(file_name: &str) -> anyhow::Result<String> {
     let path = std::path::Path::new::<PathBuf>(&env::current_dir()?.into())
         .join("res")
@@ -208,7 +207,7 @@ pub async fn load_cube(
         layout,
     ));
 
-    let mut CUBE_FRONT: &mut [ModelVertex] = &mut [
+    let cube_front: &mut [ModelVertex] = &mut [
         // FACING FRONT
         ModelVertex {
             position: [-0.5, 0.5, 0.5],
@@ -244,7 +243,7 @@ pub async fn load_cube(
         },
     ];
 
-    let mut CUBE_UP: &mut [ModelVertex] = &mut [
+    let cube_up: &mut [ModelVertex] = &mut [
         // FACING UP
         ModelVertex {
             position: [-0.5, 0.5, -0.5],
@@ -280,7 +279,7 @@ pub async fn load_cube(
         },
     ];
 
-    let mut CUBE_LEFT: &mut [ModelVertex] = &mut [
+    let cube_left: &mut [ModelVertex] = &mut [
         // FACING LEFT
         ModelVertex {
             position: [-0.5, 0.5, -0.5],
@@ -316,7 +315,7 @@ pub async fn load_cube(
         },
     ];
 
-    let mut CUBE_RIGHT: &mut [ModelVertex] = &mut [
+    let cube_right: &mut [ModelVertex] = &mut [
         // FACING RIGHT
         ModelVertex {
             position: [0.5, 0.5, 0.5],
@@ -352,7 +351,7 @@ pub async fn load_cube(
         },
     ];
 
-    let CUBE_BACK: &mut [ModelVertex] = &mut [
+    let cube_back: &mut [ModelVertex] = &mut [
         // FACING BACK
         ModelVertex {
             position: [0.5, 0.5, -0.5],
@@ -388,7 +387,7 @@ pub async fn load_cube(
         },
     ];
 
-    let mut CUBE_DOWN: &mut [ModelVertex] = &mut [
+    let cube_down: &mut [ModelVertex] = &mut [
         // FACING DOWN
         ModelVertex {
             position: [-0.5, -0.5, 0.5],
@@ -424,27 +423,26 @@ pub async fn load_cube(
         },
     ];
 
-    let mut CUBE_FACES: &mut [&mut [ModelVertex]] = &mut [
-        CUBE_UP, CUBE_DOWN, CUBE_LEFT, CUBE_RIGHT, CUBE_FRONT, CUBE_BACK,
+    let cube_faces: &mut [&mut [ModelVertex]] = &mut [
+        cube_up, cube_down, cube_left, cube_right, cube_front, cube_back,
     ];
 
-    let mut FACE_INDICES: &mut [u32] = &mut [0, 1, 2, 2, 3, 0];
+    let face_indices: &mut [u32] = &mut [0, 1, 2, 2, 3, 0];
 
-    let mut CUBE_INDICES2: &mut [[u32; 6]; 6] = &mut [
-        [0, 2, 3, 3, 1, 0],
-        [1, 3, 7, 7, 5, 1],
-        [5, 7, 6, 6, 4, 5],
-        [4, 0, 1, 1, 5, 4],
-        [2, 6, 7, 7, 3, 2],
-        [4, 6, 2, 2, 0, 4],
-    ];
+    // let cube_indices2: &mut [[u32; 6]; 6] = &mut [
+    //     [0, 2, 3, 3, 1, 0],
+    //     [1, 3, 7, 7, 5, 1],
+    //     [5, 7, 6, 6, 4, 5],
+    //     [4, 0, 1, 1, 5, 4],
+    //     [2, 6, 7, 7, 3, 2],
+    //     [4, 6, 2, 2, 0, 4],
+    // ];
 
     for i in 0..6 {
-        let vertices: &mut [ModelVertex] = &mut CUBE_FACES[i];
-        let indices = CUBE_INDICES2[i];
+        let vertices: &mut [ModelVertex] = &mut cube_faces[i];
         let mut triangles_included = vec![0; 4];
 
-        for c in FACE_INDICES.chunks(3) {
+        for c in face_indices.chunks(3) {
             let v0 = vertices[c[0] as usize];
             let v1 = vertices[c[1] as usize];
             let v2 = vertices[c[2] as usize];
@@ -508,13 +506,13 @@ pub async fn load_cube(
 
         let vertex_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some(&format!("{:?} Vertex Buffer", "cube")),
-            contents: bytemuck::cast_slice(CUBE_FACES[i]),
+            contents: bytemuck::cast_slice(cube_faces[i]),
             usage: wgpu::BufferUsages::VERTEX,
         });
 
         let index_buffer = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
             label: Some(&format!("{:?} Index Buffer", "cube")),
-            contents: bytemuck::cast_slice(&FACE_INDICES),
+            contents: bytemuck::cast_slice(&face_indices),
             usage: wgpu::BufferUsages::INDEX,
         });
 
@@ -538,6 +536,7 @@ pub async fn load_cube(
     Ok(model::Model { meshes, materials })
 }
 
+#[allow(unused)]
 pub async fn load_model(
     file_name: &str,
     device: &wgpu::Device,
