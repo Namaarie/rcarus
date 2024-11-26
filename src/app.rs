@@ -812,10 +812,18 @@ impl<'a> State<'a> {
     }
 }
 
-#[derive(Default)]
 pub struct App<'a> {
     window: Option<Arc<Window>>,
     state: Option<State<'a>>,
+}
+
+impl <'a>App<'a> {
+    pub fn new() -> Self {
+        Self {
+            window: None,
+            state: None,
+        }
+    }
 }
 
 impl ApplicationHandler for App<'_> {
@@ -864,11 +872,11 @@ impl ApplicationHandler for App<'_> {
                 }
 
                 WindowEvent::RedrawRequested => {
+                    self.state.as_mut().unwrap().update_delta_time();
+                    self.state.as_mut().unwrap().update();
+
                     match self.state.as_mut().unwrap().render() {
-                        Ok(_) => {
-                            self.state.as_mut().unwrap().update_delta_time();
-                            self.state.as_mut().unwrap().update();
-                        }
+                        Ok(_) => {}
 
                         // Reconfigure the surface if it's lost or outdated
                         Err(wgpu::SurfaceError::Lost | wgpu::SurfaceError::Outdated) => {
@@ -892,7 +900,7 @@ impl ApplicationHandler for App<'_> {
                     self.state.as_mut().unwrap().window().request_redraw();
                 }
 
-                // ignore other key presses/other events
+                // other events
                 _ => {}
             }
         }

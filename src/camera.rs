@@ -194,9 +194,10 @@ impl CameraController {
         let (yaw_sin, yaw_cos) = camera.yaw.0.sin_cos();
         let forward = Vector3::new(yaw_cos, 0.0, yaw_sin).normalize();
         let right = Vector3::new(-yaw_sin, 0.0, yaw_cos).normalize();
-        camera.position += forward * (self.amount_forward - self.amount_backward) * self.speed * dt;
-        //println!("{:?}", (self.amount_forward - self.amount_backward) * self.speed * dt);
-        camera.position += right * (self.amount_right - self.amount_left) * self.speed * dt;
+
+        let mut pos = camera.position;
+        pos += forward * (self.amount_forward - self.amount_backward);
+        pos += right * (self.amount_right - self.amount_left);
 
         // Move in/out (aka. "zoom")
         // Note: this isn't an actual zoom. The camera's position
@@ -211,7 +212,11 @@ impl CameraController {
 
         // Move up/down. Since we don't use roll, we can just
         // modify the y coordinate directly.
-        camera.position.y += (self.amount_up - self.amount_down) * self.speed * dt;
+        pos.y += self.amount_up - self.amount_down;
+
+        if pos.distance(camera.position) > 0.0 {
+            camera.position += (pos - camera.position).normalize() * self.speed * dt;
+        }
     }
 
     pub fn update_camera_rotation(&mut self, camera: &mut Camera) {
