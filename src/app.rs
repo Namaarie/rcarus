@@ -20,7 +20,7 @@ const CONFIG: Config = Config {
 };
 
 const NUM_INSTANCES_HEIGHT: u32 = 1;
-const NUM_INSTANCES_PER_ROW: u32 = 1000;
+const NUM_INSTANCES_PER_ROW: u32 = 100;
 const SPACE_BETWEEN: f32 = 1.0;
 
 #[repr(C)]

@@ -149,7 +149,7 @@ pub async fn load_cube(
     let mut meshes = Vec::new();
 
     let top_texture = load_texture(
-        "grass_block_top.png",
+        "gravel.png",
         false,
         device,
         queue,
@@ -157,9 +157,9 @@ pub async fn load_cube(
     )
     .await?;
     let down_texture =
-        load_texture("dirt.png", false, device, queue, wgpu::FilterMode::Nearest).await?;
+        load_texture("gravel.png", false, device, queue, wgpu::FilterMode::Nearest).await?;
     let side_texture = load_texture(
-        "grass_block_side.png",
+        "gravel.png",
         false,
         device,
         queue,
@@ -167,7 +167,7 @@ pub async fn load_cube(
     )
     .await?;
     let top_normal = load_texture(
-        "grass_block_top_n.png",
+        "gravelnormaldx.png",
         true,
         device,
         queue,
@@ -175,9 +175,9 @@ pub async fn load_cube(
     )
     .await?;
     let down_normal =
-        load_texture("dirt_n.png", true, device, queue, wgpu::FilterMode::Nearest).await?;
+        load_texture("gravelnormaldx.png", true, device, queue, wgpu::FilterMode::Nearest).await?;
     let side_normal = load_texture(
-        "grass_block_side_n.png",
+        "gravelnormaldx.png",
         true,
         device,
         queue,

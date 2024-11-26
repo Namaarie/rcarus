@@ -1,4 +1,4 @@
-use learn_wgpu::run;
+use rcarus::run;
 
 fn main() {
     run();

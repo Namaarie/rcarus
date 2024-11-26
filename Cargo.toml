@@ -1,5 +1,5 @@
 [package]
-name = "learn_wgpu"
+name = "rcarus"
 version = "0.1.0"
 edition = "2021"
 
@@ -35,8 +35,3 @@ codegen-units = 1
 # Do a second optimization pass over the entire program, including dependencies.
 # Slows compile times, marginal improvements.
 lto = "thin"
-
-[build-dependencies]
-anyhow = "1.0"
-glob = "0.3"
-fs_extra = "1.2"
